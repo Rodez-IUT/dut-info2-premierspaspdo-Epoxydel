@@ -24,23 +24,27 @@
 			} catch (PDOException $e) {
 				throw new PDOException($e->getMessage(), (int)$e->getCode());
 			}
-			
+
+		/* déclaration pour enlevé un bug */
+		$id = 0;
+		$username = 0;
+		$email = 0;
+		$status = 0;
+		
+		echo "<h1> ALL USER</h1>";
+		echo "<table><tr><th>Id</th><th>Username</th><th>Email</th><th>Status</th></tr>";
+		
 		/* Récupération des valeur de la table*/
-		$stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
-		$stmt->execute([$email, $status]);
-		$id = $stmt->fetch();
+		$stmt = $pdo->query('select users.id as user_id, username, email, s.name as status from users join status s on users.status_id = s.id');
+		while ($user = $stmt->fetch()) {
+			echo "<tr>";
+			echo "<td>".$user['user_id']."</td>";
+			echo "<td>".$user['username']."</td>";
+			echo "<td>".$user['email']."</td>";
+			echo "<td>".$user['status']."</td>";
+			echo "</tr>";
+		}
+		echo "</table>";
 		?>
-		<h1> ALL USER</h1>
-		<table>
-			<tr>
-				<th>Id</th>
-				<th>Username</th>
-				<th>Email</th>
-				<th>Status</th>
-			</tr>
-			<?php 
-				
-			?>
-		</table>
 	<body>
 </html>
