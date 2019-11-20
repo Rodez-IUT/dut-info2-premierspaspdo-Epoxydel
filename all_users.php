@@ -30,13 +30,24 @@
 		$username = 0;
 		$email = 0;
 		$status = 0;
-		$status_id = 2;
-		$letter = 'e';
+		$status_id = 1;
+		$letter = '';
+		
+		echo '<form method="post">start wuth letter<input type="text" name="letter">  Status : <select name="status"><option value="1">Waiting for account validation</option><option value="1">Waiting for account validation</option><option value="2">Active account</option><option value="3">Waiting for account deletion</option></select></form>';
+		if ( isset($_POST['status']) AND isset($_POST['letter']) ) {
+		$status_id = $_POST['status'];
+		$letter = $_POST['letter'];
+		$stmt = $pdo->query("select users.id as user_id, username, email, s.name as status from users join status s on users.status_id = s.id where users.status_id = $status_id and users.username like '$letter%' order by users.username");
+		} else {
+			$stmt = $pdo->query("select users.id as user_id, username, email, s.name as status from users join status s on users.status_id = s.id where users.status_id = s.id order by users.username");
+		}
+		echo $letter;
+		echo $status_id;
 		echo "<h1> ALL USER</h1>";
 		echo "<table><tr><th>Id</th><th>Username</th><th>Email</th><th>Status</th></tr>";
 		
 		/* Récupération des valeur de la table*/
-		$stmt = $pdo->query("select users.id as user_id, username, email, s.name as status from users join status s on users.status_id = s.id where users.status_id = $status_id and users.username like '$letter%' order by users.username");
+		
 		while ($user = $stmt->fetch()) {
 			echo "<tr>";
 			echo "<td>".$user['user_id']."</td>";
