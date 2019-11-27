@@ -1,0 +1,1 @@
+Quand on mets la chaine a% tous les personnes commencent par a apparaissent 
