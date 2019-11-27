@@ -1,13 +1,24 @@
-<!doctype html>
-<html lang="fr">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All users</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
 
-	<head>
-		<title> activite 2 </title>
-		<meta charset="utf-8" />
-	</head>
-	<body>
-		<?php
-		/* Connections à la base de données */
+<?php
+/* Connections à la base de données */
 			$host = 'localhost';
 			$db   = 'my_activities';
 			$user = 'root';
@@ -24,39 +35,49 @@
 			} catch (PDOException $e) {
 				throw new PDOException($e->getMessage(), (int)$e->getCode());
 			}
+			
+function get($name) {
+    return isset($_GET[$name]) ? $_GET[$name] : null;
+}
+?>
 
-		/* déclaration pour enlevé un bug */
-		$id = 0;
-		$username = 0;
-		$email = 0;
-		$status = 0;
-		$status_id = 1;
-		$letter = '';
-		
-		echo '<form method="post">start wuth letter<input type="text" name="letter">  Status : <select name="status"><option value="1">Waiting for account validation</option><option value="1">Waiting for account validation</option><option value="2">Active account</option><option value="3">Waiting for account deletion</option></select></form>';
-		if ( isset($_POST['status']) AND isset($_POST['letter']) ) {
-		$status_id = $_POST['status'];
-		$letter = $_POST['letter'];
-		$stmt = $pdo->query("select users.id as user_id, username, email, s.name as status from users join status s on users.status_id = s.id where users.status_id = $status_id and users.username like '$letter%' order by users.username");
-		} else {
-			$stmt = $pdo->query("select users.id as user_id, username, email, s.name as status from users join status s on users.status_id = s.id where users.status_id = s.id order by users.username");
-		}
-		echo $letter;
-		echo $status_id;
-		echo "<h1> ALL USER</h1>";
-		echo "<table><tr><th>Id</th><th>Username</th><th>Email</th><th>Status</th></tr>";
-		
-		/* Récupération des valeur de la table*/
-		
-		while ($user = $stmt->fetch()) {
-			echo "<tr>";
-			echo "<td>".$user['user_id']."</td>";
-			echo "<td>".$user['username']."</td>";
-			echo "<td>".$user['email']."</td>";
-			echo "<td>".$user['status']."</td>";
-			echo "</tr>";
-		}
-		echo "</table>";
-		?>
-	<body>
+<h1>All Users</h1>
+
+<form action="all_users.php" method="get">
+    Start with letter:
+    <input name="start_letter" type="text" value="<?php echo get("start_letter") ?>">
+    and status is:
+    <select name="status_id">
+        <option value="1" <?php if (get("status_id") == 1) echo 'selected' ?>>Waiting for account validation</option>
+        <option value="2" <?php if (get("status_id") == 2) echo 'selected' ?>>Active account</option>
+    </select>
+    <input type="submit" value="OK">
+</form>
+
+<?php
+$start_letter = htmlspecialchars(get("start_letter").'%');
+$status_id = (int)get("status_id");
+$sql = "select users.id as user_id, username, email, s.name as status from users join status s on users.status_id = s.id where username like :start_letter and status_id = :status_id order by username";
+$stmt = $pdo->prepare($sql);
+$stmt->execute(['start_letter' => $start_letter, 'status_id' => $status_id]);
+?>
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+    </tr>
+    <?php while ($row = $stmt->fetch()) { ?>
+        <tr>
+            <td><?php echo $row['user_id'] ?></td>
+            <td><?php echo $row['username'] ?></td>
+            <td><?php echo $row['email'] ?></td>
+            <td><?php echo $row['status'] ?></td>
+        </tr>
+    <?php } ?>
+</table>
+
+
+</body>
 </html>
