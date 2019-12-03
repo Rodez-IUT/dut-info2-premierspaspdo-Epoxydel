@@ -75,6 +75,7 @@ $stmt->execute(['start_letter' => $start_letter, 'status_id' => $status_id]);
             <td><?php echo $row['username'] ?></td>
             <td><?php echo $row['email'] ?></td>
             <td><?php echo $row['status'] ?></td>
+			<?php if ( strcmp($row['status'],"Waiting for account deletiont") != 0) { echo '<td><a href ="all_users.php">Ask deletion</a></td>';} ?>
         </tr>
     <?php } ?>
 </table>
